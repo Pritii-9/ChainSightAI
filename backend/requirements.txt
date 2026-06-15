@@ -1,0 +1,10 @@
+flask
+flask-cors
+chromadb
+pandas
+sentence-transformers
+gunicorn
+python-dotenv
+langchain
+langchain-groq
+pydantic
