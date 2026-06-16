@@ -20,6 +20,9 @@ interface AppState {
   activeTrace: string[] | null;
   setActiveTrace: (trace: string[] | null) => void;
   addTraceStep: (step: string) => void;
+
+  demoMode: boolean;
+  setDemoMode: (d: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -50,4 +53,7 @@ export const useAppStore = create<AppState>((set) => ({
   activeTrace: null,
   setActiveTrace: (trace) => set({ activeTrace: trace }),
   addTraceStep: (step) => set((state) => ({ activeTrace: [...(state.activeTrace || []), step] })),
+  
+  demoMode: false,
+  setDemoMode: (demoMode) => set({ demoMode }),
 }));

@@ -4,9 +4,11 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { CommandPalette } from '../chat/CommandPalette';
 import { useAppStore } from '../../store/useAppStore';
+import axios from 'axios';
+import { BACKEND_URL } from '../../constants';
 
 export const DashboardLayout = () => {
-  const { dark } = useAppStore();
+  const { dark, demoMode, setDemoMode } = useAppStore();
 
   useEffect(() => {
     if (dark) {
@@ -15,6 +17,16 @@ export const DashboardLayout = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [dark]);
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/health`)
+      .then((res) => {
+        if (res.data.demo_mode !== undefined) {
+          setDemoMode(res.data.demo_mode);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch health status', err));
+  }, [setDemoMode]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -28,6 +40,13 @@ export const DashboardLayout = () => {
       {/* --- Main Content Area --- */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         
+        {/* Demo Mode Banner */}
+        {demoMode && (
+          <div className="w-full bg-amber-500 text-amber-950 px-4 py-2 text-center text-xs font-bold tracking-wide z-50 flex justify-center items-center gap-2">
+            ⚠️ SYSTEM RUNNING IN DEMO MODE — MOCK DATA ACTIVE (MISSING LLM API KEY)
+          </div>
+        )}
+
         {/* Sticky Header */}
         <header className="sticky top-0 z-30 flex-shrink-0">
           <Header />

@@ -18,9 +18,15 @@ logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__)
 
+import os
+
 @api_bp.route("/health", methods=["GET"])
 def health_check():
-    return jsonify({"status": "ok", "rag_available": _HAS_RAG})
+    return jsonify({
+        "status": "ok", 
+        "rag_available": _HAS_RAG,
+        "demo_mode": not bool(os.environ.get("GROQ_API_KEY"))
+    })
 
 @api_bp.route("/copilot", methods=["POST"])
 def copilot_route():

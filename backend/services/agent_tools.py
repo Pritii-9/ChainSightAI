@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from langchain.agents import AgentType, Tool, initialize_agent
 from langchain.llms import Groq
 
-from rag_engine import query_shipments, setup_collection
+from services.rag_engine import query_shipments, setup_collection
 
 collection = setup_collection()
 
