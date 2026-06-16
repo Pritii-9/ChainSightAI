@@ -1,21 +1,23 @@
 import logging
 import os
-from flask import Flask
-from flask_cors import CORS
-from flask_socketio import SocketIO
 import sys
 
+# Mask eventlet on Python 3.13+ before importing socketio to prevent auto-import crash
 async_mode = None
-if sys.version_info < (3, 13):
+if sys.version_info >= (3, 13):
+    sys.modules['eventlet'] = None
+    async_mode = "threading"
+else:
     try:
         import eventlet
         eventlet.monkey_patch()
         async_mode = "eventlet"
     except ImportError:
-        pass
+        async_mode = "threading"
 
-if not async_mode:
-    async_mode = "threading"
+from flask import Flask
+from flask_cors import CORS
+from flask_socketio import SocketIO
 
 from api.routes import api_bp
 from core.errors import register_error_handlers
