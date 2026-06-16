@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, ArrowUpDown, Ship, Clock3, TrendingUp, Download, MoreHorizontal, MapPin } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore } from '../store/useAppStore';
 
 const STATUS_STYLES = {
   Delayed:       'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20',
