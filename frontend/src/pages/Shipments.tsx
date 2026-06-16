@@ -1,14 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, ArrowUpDown, Ship, Clock3, TrendingUp, Download, MoreHorizontal, MapPin } from 'lucide-react';
-
-const MOCK_SHIPMENTS = [
-  { id: 'SO-4521', origin: 'Shanghai Port, CN',  destination: 'Long Beach, CA',   status: 'Delayed',     eta: 'Jun 12', carrier: 'Maersk',      sla: '$18,500' },
-  { id: 'SO-4522', origin: 'Shenzhen, CN',        destination: 'Rotterdam, NL',    status: 'In Transit',  eta: 'Jun 15', carrier: 'MSC',          sla: 'Nominal' },
-  { id: 'SO-4523', origin: 'Kaohsiung, TW',       destination: 'Los Angeles, CA',  status: 'At Risk',     eta: 'Jun 14', carrier: 'Evergreen',    sla: '$6,200'  },
-  { id: 'SO-4524', origin: 'Busan, KR',           destination: 'Seattle, WA',      status: 'On Schedule', eta: 'Jun 11', carrier: 'Hapag-Lloyd',  sla: 'Nominal' },
-  { id: 'SO-4525', origin: 'Singapore, SG',       destination: 'Hamburg, DE',      status: 'On Schedule', eta: 'Jun 18', carrier: 'CMA CGM',      sla: 'Nominal' },
-  { id: 'SO-4526', origin: 'Hong Kong, HK',       destination: 'Savannah, GA',     status: 'In Transit',  eta: 'Jun 20', carrier: 'COSCO',        sla: 'Nominal' },
-];
+import { useAppStore } from '../../store/useAppStore';
 
 const STATUS_STYLES = {
   Delayed:       'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20',
@@ -24,9 +16,10 @@ const SUMMARY_CARDS = [
 ];
 
 export const Shipments = () => {
+  const { shipments } = useAppStore();
   const [search, setSearch] = useState('');
   
-  const filtered = MOCK_SHIPMENTS.filter((s) =>
+  const filtered = shipments.filter((s: any) =>
     [s.id, s.carrier, s.origin, s.destination].some((f) => f.toLowerCase().includes(search.toLowerCase()))
   );
 
@@ -170,7 +163,7 @@ export const Shipments = () => {
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900">
           <span className="text-sm text-slate-500 dark:text-slate-400">
-            Showing <span className="font-bold text-slate-900 dark:text-white">{filtered.length}</span> of {MOCK_SHIPMENTS.length} active shipments
+            Showing <span className="font-bold text-slate-900 dark:text-white">{filtered.length}</span> of {shipments.length} active shipments
           </span>
           <div className="flex gap-2">
             <button className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-slate-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300" disabled>

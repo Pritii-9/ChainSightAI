@@ -11,8 +11,18 @@ build/
 *.spec
 venv/
 env/
+.venv/
 .env
 .env.local
+
+# ML model cache — very large, never commit
+*.chromadb/
+backend/services/.chromadb/
+backend/.chromadb/
+# HuggingFace / sentence-transformers model cache
+~/.cache/huggingface/
+*.bin
+*.safetensors
 
 # Node
 node_modules/

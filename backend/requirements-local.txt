@@ -1,0 +1,11 @@
+# ============================================================
+# LOCAL DEV — includes heavy ML/RAG stack
+# Install with: pip install -r requirements-local.txt
+# ============================================================
+-r requirements.txt
+
+# RAG & Vector DB (heavy — not needed on free tier)
+chromadb>=0.4.0
+pandas==3.0.2
+sentence-transformers==5.4.1
+langchain-core==0.3.84

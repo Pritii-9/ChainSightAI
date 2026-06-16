@@ -45,12 +45,7 @@ def _embedding_function(texts):
 
 def _get_client() -> chromadb.Client:
     PERSIST_DIR.mkdir(parents=True, exist_ok=True)
-    return chromadb.Client(
-        Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=str(PERSIST_DIR),
-        )
-    )
+    return chromadb.PersistentClient(path=str(PERSIST_DIR))
 
 
 def _collection_exists(client: chromadb.Client) -> bool:

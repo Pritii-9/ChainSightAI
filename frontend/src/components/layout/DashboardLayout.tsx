@@ -4,11 +4,16 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { CommandPalette } from '../chat/CommandPalette';
 import { useAppStore } from '../../store/useAppStore';
+import { useRealtime } from '../../hooks/useRealtime';
 import axios from 'axios';
 import { BACKEND_URL } from '../../constants';
+import { AlertTriangle, X } from 'lucide-react';
 
 export const DashboardLayout = () => {
-  const { dark, demoMode, setDemoMode } = useAppStore();
+  const { dark, demoMode, setDemoMode, realtimeAlerts, removeRealtimeAlert } = useAppStore();
+  
+  // Initialize real-time WebSocket connection
+  useRealtime();
 
   useEffect(() => {
     if (dark) {
@@ -62,6 +67,52 @@ export const DashboardLayout = () => {
 
       {/* --- Global Overlays --- */}
       <CommandPalette />
+
+      {/* --- Real-Time Toasts --- */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 w-80">
+        {realtimeAlerts.map((alert) => (
+          <div key={alert.id} className="relative overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 animate-fade-in">
+            {/* Severity Indicator */}
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${
+              alert.severity === 'critical' ? 'bg-rose-500' :
+              alert.severity === 'high' ? 'bg-amber-500' : 'bg-blue-500'
+            }`} />
+            
+            <button 
+              onClick={() => removeRealtimeAlert(alert.id)}
+              className="absolute right-2 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              <X size={14} />
+            </button>
+            
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={18} className={`mt-0.5 ${
+                alert.severity === 'critical' ? 'text-rose-500' :
+                alert.severity === 'high' ? 'text-amber-500' : 'text-blue-500'
+              }`} />
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  {alert.type.replace('_', ' ')}
+                </h4>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {alert.message}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold text-slate-500">{alert.shipment_id}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400">&rarr;</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${
+                    alert.status_change === 'Delayed' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400' :
+                    alert.status_change === 'At Risk' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' :
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                  }`}>
+                    {alert.status_change}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
