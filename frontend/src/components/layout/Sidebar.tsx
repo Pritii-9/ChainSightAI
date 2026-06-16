@@ -16,9 +16,7 @@ export const Sidebar = () => {
       
       {/* --- Brand Header --- */}
       <div className="flex h-16 items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/30">
-          <Network size={20} strokeWidth={2.5} />
-        </div>
+        <img src="/icons.svg" alt="ChainSight AI Logo" className="h-9 w-9 object-contain" />
         <div className="flex flex-col">
           <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
             ChainSight AI
