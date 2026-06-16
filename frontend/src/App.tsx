@@ -3,6 +3,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Shipments } from './pages/Shipments';
 import { Incidents } from './pages/Incidents';
+import { Analytics } from './pages/Analytics';
 import { Settings } from './pages/Settings';
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="shipments" element={<Shipments />} />
           <Route path="incidents" element={<Incidents />} />
+          <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

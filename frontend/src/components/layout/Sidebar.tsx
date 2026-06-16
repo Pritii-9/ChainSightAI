@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Ship, AlertTriangle, Settings, Network, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, Ship, AlertTriangle, BarChart3, Settings, ShieldCheck, LogOut } from 'lucide-react';
 
 const NAV = [
   { name: 'Dashboard',  path: '/',          icon: LayoutDashboard, sub: 'Executive telemetry' },
   { name: 'Shipments',  path: '/shipments', icon: Ship,            sub: 'Global movement grid' },
   { name: 'Incidents',  path: '/incidents', icon: AlertTriangle,   sub: 'Escalation center', badge: 3 },
+  { name: 'Analytics',  path: '/analytics', icon: BarChart3,       sub: 'Trend intelligence' },
   { name: 'Settings',   path: '/settings',  icon: Settings,        sub: 'Platform governance' },
 ];
 

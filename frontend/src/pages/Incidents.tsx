@@ -98,7 +98,7 @@ export const Incidents = () => (
 
       {/* List */}
       <div className="divide-y divide-slate-100 dark:divide-slate-800">
-        {INCIDENTS.map((incident, idx) => {
+        {INCIDENTS.map((incident) => {
           const styles = SEVERITY_STYLES[incident.severity as keyof typeof SEVERITY_STYLES];
           
           return (

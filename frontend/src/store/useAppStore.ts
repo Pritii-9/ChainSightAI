@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ChatMessage } from '../types';
+import type { ChatMessage, RealtimeAlert, Shipment } from '../types';
 
 interface AppState {
   dark: boolean;
@@ -24,11 +24,11 @@ interface AppState {
   demoMode: boolean;
   setDemoMode: (d: boolean) => void;
 
-  realtimeAlerts: any[];
-  addRealtimeAlert: (alert: any) => void;
+  realtimeAlerts: RealtimeAlert[];
+  addRealtimeAlert: (alert: Omit<RealtimeAlert, 'id'>) => void;
   removeRealtimeAlert: (id: string) => void;
 
-  shipments: any[];
+  shipments: Shipment[];
   updateShipmentStatus: (shipmentId: string, status: string) => void;
 }
 
@@ -67,7 +67,7 @@ export const useAppStore = create<AppState>((set) => ({
   realtimeAlerts: [],
   addRealtimeAlert: (alert) => set((state) => {
     // Keep only the 3 most recent alerts to avoid clutter
-    const newAlerts = [{...alert, id: Date.now().toString()}, ...state.realtimeAlerts].slice(0, 3);
+    const newAlerts: RealtimeAlert[] = [{ ...alert, id: Date.now().toString() }, ...state.realtimeAlerts].slice(0, 3);
     return { realtimeAlerts: newAlerts };
   }),
   removeRealtimeAlert: (id) => set((state) => ({

@@ -7,6 +7,7 @@ const PAGE_TITLES: Record<string, { title: string; desc: string }> = {
   '/':          { title: 'Dashboard',  desc: 'Executive telemetry & operational overview' },
   '/shipments': { title: 'Shipments',  desc: 'Global shipment registry & carrier tracking' },
   '/incidents': { title: 'Incidents',  desc: 'Active escalations & SLA breach management' },
+  '/analytics': { title: 'Analytics',  desc: '30-day trend intelligence & cost exposure' },
   '/settings':  { title: 'Settings',   desc: 'Platform integrations & governance controls' },
 };
 

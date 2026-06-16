@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Clock, ArrowUpRight, Activity, ShieldCheck, Zap } from 'lucide-react';
 import { AnalyticsCard } from '../components/analytics/AnalyticsCard';
 import { ChatPanel } from '../components/chat/ChatPanel';
 import { ExecutionTimeline } from '../components/timeline/ExecutionTimeline';
-import { KPI_TILES } from '../constants';
+import { ShipmentMap } from '../components/map/ShipmentMap';
+import { BACKEND_URL } from '../constants';
 
 // --- Types ---
 interface HeroMetric {
@@ -11,6 +13,16 @@ interface HeroMetric {
   value: string;
   tone: string;
   icon?: React.ReactNode;
+}
+
+interface KpiTile {
+  label: string;
+  value: string;
+  trend: 'up' | 'down';
+  trendVal: string;
+  sublabel?: string;
+  positiveDown?: boolean;
+  chart: number[];
 }
 
 // --- Constants ---
@@ -35,13 +47,35 @@ const HERO_METRICS: HeroMetric[] = [
   },
 ];
 
+// --- Animated Counter Hook ---
+
 export const Dashboard: React.FC = () => {
+  const [kpis, setKpis] = useState<KpiTile[]>([]);
+  const [kpiLoading, setKpiLoading] = useState(true);
+
   const now: string = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/analytics/summary`)
+      .then(res => {
+        setKpis(res.data.kpis);
+      })
+      .catch(() => {
+        // Fallback to static data if API is down
+        setKpis([
+          { label: 'Active Shipments', value: '2,847', trend: 'up', trendVal: '+4.2%', chart: [12,14,18,15,20,24,22], sublabel: '14 ocean carriers' },
+          { label: 'Critical Alerts', value: '12', trend: 'down', trendVal: '−15%', chart: [30,25,20,22,18,15,12], sublabel: '3 require action', positiveDown: true },
+          { label: 'SLA Exposure', value: '$2.4M', trend: 'up', trendVal: '+8.1%', chart: [1.8,2.0,1.9,2.1,2.3,2.2,2.4], sublabel: 'Tier-1 contracts' },
+          { label: 'Avg Delay', value: '6.2h', trend: 'down', trendVal: '−1.2h', chart: [8.0,7.5,7.8,6.9,6.5,6.3,6.2], sublabel: 'vs 7.4h prior week', positiveDown: true },
+        ]);
+      })
+      .finally(() => setKpiLoading(false));
+  }, []);
 
   return (
     <div className="flex flex-col gap-8 p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
@@ -104,12 +138,23 @@ export const Dashboard: React.FC = () => {
         </div>
       </section>
 
-      {/* --- KPI TILES --- */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {KPI_TILES.map((kpi: any) => (
-          <AnalyticsCard key={kpi.label} {...kpi} />
-        ))}
-      </div>
+      {/* --- KPI TILES (from backend) --- */}
+      {kpiLoading ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-800" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {kpis.map((kpi) => (
+            <AnalyticsCard key={kpi.label} {...kpi} />
+          ))}
+        </div>
+      )}
+
+      {/* --- SHIPMENT MAP --- */}
+      <ShipmentMap />
 
       {/* --- MAIN CONTENT GRID --- */}
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">

@@ -65,6 +65,9 @@ def create_app():
     register_error_handlers(app)
     app.register_blueprint(api_bp)
 
+    from api.analytics_routes import analytics_bp
+    app.register_blueprint(analytics_bp)
+
     from services.simulator import start_simulator
     start_simulator(socketio, app)
 

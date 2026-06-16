@@ -26,3 +26,22 @@ export interface ChatMessage {
   responsePayload?: CopilotResponse;
   timestamp: Date;
 }
+
+export interface RealtimeAlert {
+  id: string;
+  shipment_id: string;
+  type: string;
+  message: string;
+  status_change: string;
+  severity: 'critical' | 'high' | 'low';
+}
+
+export interface Shipment {
+  id: string;
+  origin: string;
+  destination: string;
+  status: string;
+  eta: string;
+  carrier: string;
+  sla: string;
+}

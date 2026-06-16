@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import axios from 'axios';
-import { Network, Loader2, Send, Bot, Activity, ChevronRight, AlertCircle, Sparkles } from 'lucide-react';
+import { Network, Loader2, Send, Bot, ChevronRight, AlertCircle, Sparkles } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { BACKEND_URL, EXAMPLE_QUERIES } from '../../constants';
 import type { CopilotResponse } from '../../types';

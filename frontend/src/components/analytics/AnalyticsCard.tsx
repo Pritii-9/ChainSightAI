@@ -1,5 +1,5 @@
-import React from 'react';
-import { Activity, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+
+import { Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AreaChart, Area, Tooltip, YAxis, ResponsiveContainer } from 'recharts';
 
 // --- Sparkline Component ---
