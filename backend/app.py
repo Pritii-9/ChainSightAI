@@ -3,9 +3,19 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
-import eventlet
+import sys
 
-eventlet.monkey_patch()
+async_mode = None
+if sys.version_info < (3, 13):
+    try:
+        import eventlet
+        eventlet.monkey_patch()
+        async_mode = "eventlet"
+    except ImportError:
+        pass
+
+if not async_mode:
+    async_mode = "threading"
 
 from api.routes import api_bp
 from core.errors import register_error_handlers
@@ -31,7 +41,7 @@ def create_app():
             "http://localhost:4174",
             "http://127.0.0.1:4174",
         ],
-        async_mode="eventlet"
+        async_mode=async_mode
     )
 
     CORS(
@@ -62,5 +72,5 @@ app = create_app()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    logger.info(f"Starting server on port {port} with eventlet...")
+    logger.info(f"Starting server on port {port} with {async_mode}...")
     socketio.run(app, host="0.0.0.0", port=port)
