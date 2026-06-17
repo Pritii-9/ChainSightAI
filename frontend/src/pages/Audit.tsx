@@ -1,4 +1,3 @@
-import React from 'react';
 import { Shield, Activity, FileText, CheckCircle2, XCircle } from 'lucide-react';
 
 const MOCK_AUDIT_LOGS = [

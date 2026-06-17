@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { supabase, IS_DEMO_MODE } from '../lib/supabase';
 import { Loader2, Mail, ArrowRight, ShieldCheck, KeyRound, ArrowLeft } from 'lucide-react';
 

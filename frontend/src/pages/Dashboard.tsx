@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Clock, ArrowUpRight, Activity, ShieldCheck, Zap } from 'lucide-react';
 import { AnalyticsCard } from '../components/analytics/AnalyticsCard';
