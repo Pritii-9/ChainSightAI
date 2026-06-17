@@ -19,3 +19,6 @@ requests==2.32.3
 
 # Production server
 gunicorn==23.0.0
+
+# Real-time AIS
+websocket-client==1.8.0

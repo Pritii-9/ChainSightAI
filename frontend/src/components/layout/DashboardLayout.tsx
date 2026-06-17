@@ -34,7 +34,7 @@ export const DashboardLayout = () => {
   }, [setDemoMode]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex h-screen w-full overflow-hidden bg-[var(--page-bg)] text-slate-900 dark:text-slate-100">
       
       {/* --- Sidebar --- */}
       {/* Fixed width on desktop, hidden on mobile by default (handled inside Sidebar component) */}
@@ -47,8 +47,8 @@ export const DashboardLayout = () => {
         
         {/* Demo Mode Banner */}
         {demoMode && (
-          <div className="w-full bg-amber-500 text-amber-950 px-4 py-2 text-center text-xs font-bold tracking-wide z-50 flex justify-center items-center gap-2">
-            ⚠️ SYSTEM RUNNING IN DEMO MODE — MOCK DATA ACTIVE (MISSING LLM API KEY)
+          <div className="w-full bg-amber-100 text-amber-900 border-b border-amber-200 px-4 py-2 text-center text-xs font-medium tracking-wide z-50 flex justify-center items-center gap-2 dark:bg-amber-900/30 dark:border-amber-900/50 dark:text-amber-400">
+            System running in demo mode (Mock data active)
           </div>
         )}
 
@@ -59,7 +59,7 @@ export const DashboardLayout = () => {
 
         {/* Scrollable Main Content */}
         <main className="flex-1 overflow-y-auto scroll-smooth p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl animate-fade-in">
+          <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
         </main>
@@ -71,39 +71,39 @@ export const DashboardLayout = () => {
       {/* --- Real-Time Toasts --- */}
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 w-80">
         {realtimeAlerts.map((alert) => (
-          <div key={alert.id} className="relative overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 animate-fade-in">
+          <div key={alert.id} className="relative overflow-hidden rounded-md bg-white p-4 border border-slate-200 shadow-sm dark:bg-black dark:border-zinc-800">
             {/* Severity Indicator */}
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${
-              alert.severity === 'critical' ? 'bg-rose-500' :
-              alert.severity === 'high' ? 'bg-amber-500' : 'bg-blue-500'
+              alert.severity === 'critical' ? 'bg-red-500' :
+              alert.severity === 'high' ? 'bg-amber-500' : 'bg-slate-900 dark:bg-white'
             }`} />
             
             <button 
               onClick={() => removeRealtimeAlert(alert.id)}
-              className="absolute right-2 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              className="absolute right-2 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             >
               <X size={14} />
             </button>
             
             <div className="flex items-start gap-3">
-              <AlertTriangle size={18} className={`mt-0.5 ${
-                alert.severity === 'critical' ? 'text-rose-500' :
-                alert.severity === 'high' ? 'text-amber-500' : 'text-blue-500'
+              <AlertTriangle size={16} strokeWidth={1.5} className={`mt-0.5 ${
+                alert.severity === 'critical' ? 'text-red-500' :
+                alert.severity === 'high' ? 'text-amber-500' : 'text-slate-900 dark:text-white'
               }`} />
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-sm font-medium text-slate-900 dark:text-white">
                   {alert.type.replace('_', ' ')}
                 </h4>
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {alert.message}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold text-slate-500">{alert.shipment_id}</span>
+                  <span className="text-[10px] font-mono font-medium text-slate-500">{alert.shipment_id}</span>
                   <span className="text-[10px] uppercase tracking-wider text-slate-400">&rarr;</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${
-                    alert.status_change === 'Delayed' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400' :
-                    alert.status_change === 'At Risk' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' :
-                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                  <span className={`text-[10px] font-medium uppercase tracking-wider ${
+                    alert.status_change === 'Delayed' ? 'text-red-600 dark:text-red-400' :
+                    alert.status_change === 'At Risk' ? 'text-amber-600 dark:text-amber-400' :
+                    'text-slate-600 dark:text-slate-400'
                   }`}>
                     {alert.status_change}
                   </span>

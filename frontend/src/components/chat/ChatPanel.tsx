@@ -78,18 +78,18 @@ export const ChatPanel = () => {
   };
 
   return (
-    <div className="flex h-[650px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="flex h-[650px] flex-col overflow-hidden rounded-md border border-slate-200 bg-white dark:border-zinc-800 dark:bg-black">
       
       {/* --- Header --- */}
-      <div className="flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-black">
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-            <Bot size={20} strokeWidth={2} className={loading ? 'animate-pulse' : ''} />
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-slate-700 dark:bg-zinc-900 dark:text-slate-300">
+            <Bot size={20} strokeWidth={1.5} className={loading ? 'animate-pulse' : ''} />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Copilot</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">AI Copilot</h2>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-600 dark:bg-zinc-800 dark:text-slate-400">
                 LLaMA 3.3
               </span>
               <span className="text-xs text-slate-400 dark:text-slate-500">• RAG Enhanced</span>
@@ -97,13 +97,13 @@ export const ChatPanel = () => {
           </div>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="flex h-2 w-2 rounded-full bg-black dark:bg-white animate-pulse" />
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400">System Online</span>
         </div>
       </div>
 
       {/* --- Messages Area --- */}
-      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 dark:bg-slate-950/50">
+      <div className="flex-1 overflow-y-auto bg-[var(--page-bg)] p-6 dark:bg-black">
         <div className="mx-auto max-w-3xl space-y-8">
           
           {messages.map((msg) => (
@@ -112,10 +112,10 @@ export const ChatPanel = () => {
               className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
               {/* Avatar */}
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm ${
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                 msg.role === 'user' 
-                  ? 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200' 
-                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  ? 'bg-slate-200 text-slate-700 dark:bg-zinc-800 dark:text-slate-200' 
+                  : 'bg-black text-white dark:bg-white dark:text-black'
               }`}>
                 {msg.role === 'user' ? 'ME' : <Network size={14} />}
               </div>
@@ -123,7 +123,7 @@ export const ChatPanel = () => {
               {/* Content Bubble */}
               <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start max-w-[85%]'}`}>
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
                     {msg.role === 'user' ? 'You' : 'ChainSight AI'}
                   </span>
                   <span className="text-[10px] text-slate-400">
@@ -132,11 +132,11 @@ export const ChatPanel = () => {
                 </div>
 
                 {msg.role === 'user' ? (
-                  <div className="rounded-2xl rounded-tr-sm bg-slate-900 px-5 py-3 text-sm leading-relaxed text-white shadow-md dark:bg-slate-100 dark:text-slate-900">
+                  <div className="rounded-md bg-black px-4 py-2.5 text-sm leading-relaxed text-white dark:bg-zinc-800 dark:text-white">
                     {msg.content}
                   </div>
                 ) : !msg.responsePayload ? (
-                  <div className="rounded-2xl rounded-tl-sm bg-white px-5 py-3 text-sm leading-relaxed text-slate-700 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
+                  <div className="rounded-md border border-slate-200 bg-white px-4 py-2.5 text-sm leading-relaxed text-slate-700 dark:border-zinc-800 dark:bg-black dark:text-slate-300">
                     {msg.content}
                   </div>
                 ) : (
@@ -146,9 +146,9 @@ export const ChatPanel = () => {
                     const cfg = STATUS_CONFIG[statusKey] ?? STATUS_CONFIG['On Schedule'];
 
                     return (
-                      <div className="w-full overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                      <div className="w-full overflow-hidden rounded-md bg-white border border-slate-200 dark:bg-black dark:border-zinc-800">
                         {/* Status Header */}
-                        <div className={`flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-700 ${cfg.headerBg}`}>
+                        <div className={`flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-zinc-800 ${cfg.headerBg}`}>
                           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
                             <span className={`h-2.5 w-2.5 rounded-full ${cfg.dot}`} />
                             Analysis Complete
@@ -192,9 +192,9 @@ export const ChatPanel = () => {
                               </h4>
                               <div className="space-y-3">
                                 {msg.responsePayload.final_answer.prescriptive_mitigations.map((mitigation, idx) => (
-                                  <div key={idx} className="group flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-blue-200 hover:bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-blue-800 dark:hover:bg-slate-800 lg:flex-row lg:items-center">
+                                  <div key={idx} className="group flex flex-col gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 transition-colors hover:border-black dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-white lg:flex-row lg:items-center">
                                     <div className="flex-1">
-                                      <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                      <div className="mb-1 font-mono text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         {mitigation.action_id}
                                       </div>
                                       <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
@@ -202,14 +202,14 @@ export const ChatPanel = () => {
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-3 lg:justify-end">
-                                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold font-mono ${
+                                      <span className={`rounded-sm px-2 py-0.5 text-[10px] font-medium font-mono ${
                                         mitigation.cost_implication.startsWith('+')
-                                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
-                                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                                          : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
                                       }`}>
                                         {mitigation.cost_implication}
                                       </span>
-                                      <button className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-95">
+                                      <button className="inline-flex items-center gap-1.5 rounded-md bg-black px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-slate-200">
                                         Execute
                                         <ChevronRight size={12} />
                                       </button>
@@ -231,13 +231,13 @@ export const ChatPanel = () => {
           {/* Loading State */}
           {loading && (
             <div className="flex gap-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-slate-400">
                 <Loader2 size={14} className="animate-spin" />
               </div>
-              <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+              <div className="flex items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 dark:border-zinc-800 dark:bg-black dark:text-slate-300">
                 <span className="flex gap-1">
                   {[0, 150, 300].map((delay) => (
-                    <span key={delay} className="h-1.5 w-1.5 animate-bounce rounded-full bg-blue-500" style={{ animationDelay: `${delay}ms` }} />
+                    <span key={delay} className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 dark:bg-slate-500" style={{ animationDelay: `${delay}ms` }} />
                   ))}
                 </span>
                 Analyzing telemetry data...
@@ -249,7 +249,7 @@ export const ChatPanel = () => {
       </div>
 
       {/* --- Input Area --- */}
-      <div className="border-t border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+      <div className="border-t border-slate-200 bg-white p-4 dark:border-zinc-800 dark:bg-black">
         {/* Suggested Queries */}
         <div className="mb-4 flex flex-wrap gap-2">
           {EXAMPLE_QUERIES.map((sample) => (
@@ -257,7 +257,7 @@ export const ChatPanel = () => {
               key={sample}
               onClick={() => setQuery(sample)}
               disabled={loading}
-              className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-700 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
+              className="rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-slate-600 transition-colors hover:border-black hover:text-black disabled:opacity-50 dark:border-zinc-800 dark:text-slate-400 dark:hover:border-white dark:hover:text-white"
             >
               {sample}
             </button>
@@ -267,22 +267,22 @@ export const ChatPanel = () => {
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
           <div className="relative flex-1">
-            <AlertCircle size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <AlertCircle size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask about delays, risks, or actions..."
               disabled={loading}
-              className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:bg-slate-900"
+              className="w-full rounded-md border border-slate-200 bg-transparent py-2.5 pl-9 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:opacity-50 dark:border-zinc-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-white dark:focus:ring-white"
             />
           </div>
           <button
             type="submit"
             disabled={loading || !query.trim()}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+            className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-md bg-black text-white transition-colors hover:bg-slate-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-slate-200"
           >
-            {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} strokeWidth={2.5} />}
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} strokeWidth={2} />}
           </button>
         </form>
       </div>

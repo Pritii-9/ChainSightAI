@@ -71,6 +71,9 @@ def create_app():
     from services.simulator import start_simulator
     start_simulator(socketio, app)
 
+    from services.ais_stream import start_ais_stream
+    start_ais_stream(socketio)
+
     return app
 
 app = create_app()

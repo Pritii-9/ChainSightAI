@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { ChatMessage, RealtimeAlert, Shipment } from '../types';
+import { supabase } from '../lib/supabase';
+import type { ChatMessage, RealtimeAlert, Shipment, LiveShip } from '../types';
 
 interface AppState {
   dark: boolean;
@@ -30,6 +31,11 @@ interface AppState {
 
   shipments: Shipment[];
   updateShipmentStatus: (shipmentId: string, status: string) => void;
+
+  liveShips: Record<number, LiveShip>;
+  addLiveShip: (ship: LiveShip) => void;
+
+  fetchShipments: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -84,5 +90,28 @@ export const useAppStore = create<AppState>((set) => ({
   ],
   updateShipmentStatus: (shipmentId, status) => set((state) => ({
     shipments: state.shipments.map(s => s.id === shipmentId ? { ...s, status } : s)
-  }))
+  })),
+
+  liveShips: {},
+  addLiveShip: (ship) => set((state) => {
+    // Keep max 500 ships to prevent memory issues
+    const newShips = { ...state.liveShips, [ship.mmsi]: ship };
+    if (Object.keys(newShips).length > 500) {
+      const oldestKey = Object.keys(newShips)[0];
+      delete newShips[oldestKey as unknown as number];
+    }
+    return { liveShips: newShips };
+  }),
+
+  fetchShipments: async () => {
+    try {
+      const { data, error } = await supabase.from('shipments').select('*');
+      if (error) throw error;
+      if (data && data.length > 0) {
+        set({ shipments: data });
+      }
+    } catch (err) {
+      console.warn('Failed to fetch shipments from Supabase. Falling back to default data.', err);
+    }
+  }
 }));

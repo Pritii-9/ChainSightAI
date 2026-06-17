@@ -45,3 +45,13 @@ export interface Shipment {
   carrier: string;
   sla: string;
 }
+
+export interface LiveShip {
+  mmsi: number;
+  name: string;
+  lat: number;
+  lng: number;
+  cog: number;
+  sog: number;
+  timestamp: string;
+}

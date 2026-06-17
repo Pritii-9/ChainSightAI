@@ -71,54 +71,47 @@ export const AnalyticsCard = ({
   const chartColor = isPositive ? '#10b981' : '#f43f5e'; // Emerald-500 : Rose-500
   
   // Dynamic Icon Styling based on label context
-  let iconBgClass = 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400';
-  if (label.includes('Delay') || label.includes('Alert') || label.includes('Error')) {
-    iconBgClass = 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400';
-  } else if (label.includes('Exposure') || label.includes('Risk')) {
-    iconBgClass = 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400';
-  } else if (label.includes('Success') || label.includes('Uptime')) {
-    iconBgClass = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400';
-  }
+  const iconBgClass = 'bg-slate-100 text-slate-600 dark:bg-zinc-900 dark:text-slate-400';
 
   const TrendIcon = trend === 'up' ? ArrowUpRight : ArrowDownRight;
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-md border border-slate-200 bg-white p-5 transition-colors hover:border-black dark:border-zinc-800 dark:bg-black dark:hover:border-white">
       
       {/* Header Section */}
       <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <div className="space-y-0.5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {label}
           </p>
-          <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h3 className="text-2xl font-semibold tracking-tight text-black dark:text-white">
             {value}
           </h3>
           {sublabel && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">{sublabel}</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{sublabel}</p>
           )}
         </div>
         
         {/* Icon Box */}
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBgClass} transition-colors`}>
-          <Activity size={18} strokeWidth={2} />
+        <div className={`flex h-8 w-8 items-center justify-center rounded-md ${iconBgClass}`}>
+          <Activity size={14} strokeWidth={1.5} />
         </div>
       </div>
 
       {/* Footer Section: Trend & Sparkline */}
-      <div className="mt-6 flex items-end justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
+      <div className="mt-6 flex items-end justify-between border-t border-slate-100 pt-4 dark:border-zinc-800/50">
         <div className="flex flex-col gap-1">
           <div
-            className={`inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+            className={`inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ${
               isPositive
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'
+                ? 'bg-slate-100 text-black dark:bg-zinc-900 dark:text-white'
+                : 'bg-slate-100 text-slate-500 dark:bg-zinc-900 dark:text-slate-400'
             }`}
           >
-            <TrendIcon size={12} strokeWidth={2.5} />
+            <TrendIcon size={10} strokeWidth={2} />
             {trendVal}
           </div>
-          <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">
             vs last week
           </span>
         </div>

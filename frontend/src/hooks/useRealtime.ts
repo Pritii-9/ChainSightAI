@@ -28,6 +28,11 @@ export const useRealtime = () => {
       }
     });
 
+    socket.on('ais_position', (data) => {
+      // Add real-time ship position to the store
+      useAppStore.getState().addLiveShip(data);
+    });
+
     socket.on('disconnect', () => {
       console.log('Disconnected from real-time telemetry stream');
     });

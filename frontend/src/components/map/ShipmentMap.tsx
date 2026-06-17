@@ -41,19 +41,19 @@ const WORLD_PATH = `
 `;
 
 export const ShipmentMap = () => {
-  const { shipments } = useAppStore();
+  const { shipments, liveShips } = useAppStore();
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 shadow-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-950">
+    <div className="relative w-full overflow-hidden rounded-md border border-slate-200 bg-white dark:border-zinc-800 dark:bg-black">
       {/* Title overlay */}
       <div className="absolute left-5 top-4 z-10">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Global Shipment Routes
         </h3>
         <div className="mt-2 flex items-center gap-4">
           {Object.entries(STATUS_COLORS).map(([status, color]) => (
             <div key={status} className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
               <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{status}</span>
             </div>
           ))}
@@ -157,6 +157,26 @@ export const ShipmentMap = () => {
                 style={{ fontSize: 9, fontWeight: 600 }}
               >
                 {label}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Live Ships (AIS) */}
+        {Object.values(liveShips).map((ship) => {
+          // Simple linear projection to fit 1000x500 viewBox
+          const x = (ship.lng + 180) * (1000 / 360);
+          const y = 500 - (ship.lat + 90) * (500 / 180) - 20;
+
+          return (
+            <g key={ship.mmsi} className="group cursor-pointer">
+              <circle cx={x} cy={y} r="2.5" fill="#f59e0b" className="transition-all group-hover:r-[4px] group-hover:fill-amber-400" />
+              <circle cx={x} cy={y} r="6" fill="none" stroke="#f59e0b" strokeWidth="1" opacity="0.5">
+                <animate attributeName="r" values="2.5;8;2.5" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+              </circle>
+              <text x={x} y={y - 10} textAnchor="middle" className="hidden group-hover:block fill-slate-900 dark:fill-white drop-shadow-md" style={{ fontSize: 10, fontWeight: 700 }}>
+                {ship.name || ship.mmsi}
               </text>
             </g>
           );
