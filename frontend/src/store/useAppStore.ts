@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import axios from 'axios';
 import type { ChatMessage, RealtimeAlert, Shipment, LiveShip } from '../types';
 
 interface AppState {
@@ -74,20 +74,22 @@ export const useAppStore = create<AppState>((set) => ({
   addRealtimeAlert: (alert) => set((state) => {
     // Keep only the 3 most recent alerts to avoid clutter
     const newAlerts: RealtimeAlert[] = [{ ...alert, id: Date.now().toString() }, ...state.realtimeAlerts].slice(0, 3);
+    
+    // Trigger Browser Push Notification for critical alerts
+    if (Notification.permission === 'granted' && (alert.severity === 'critical' || alert.severity === 'high')) {
+      new Notification(`ChainSight AI Alert: ${alert.status_change}`, {
+        body: alert.message,
+        icon: '/icons.svg'
+      });
+    }
+
     return { realtimeAlerts: newAlerts };
   }),
   removeRealtimeAlert: (id) => set((state) => ({
     realtimeAlerts: state.realtimeAlerts.filter(a => a.id !== id)
   })),
 
-  shipments: [
-    { id: 'SO-4521', origin: 'Shanghai Port, CN',  destination: 'Long Beach, CA',   status: 'On Schedule', eta: 'Jun 12', carrier: 'Maersk',      sla: '$18,500' },
-    { id: 'SO-4522', origin: 'Shenzhen, CN',        destination: 'Rotterdam, NL',    status: 'In Transit',  eta: 'Jun 15', carrier: 'MSC',          sla: 'Nominal' },
-    { id: 'SO-4523', origin: 'Kaohsiung, TW',       destination: 'Los Angeles, CA',  status: 'On Schedule', eta: 'Jun 14', carrier: 'Evergreen',    sla: '$6,200'  },
-    { id: 'SO-4524', origin: 'Busan, KR',           destination: 'Seattle, WA',      status: 'On Schedule', eta: 'Jun 11', carrier: 'Hapag-Lloyd',  sla: 'Nominal' },
-    { id: 'SO-4525', origin: 'Singapore, SG',       destination: 'Hamburg, DE',      status: 'On Schedule', eta: 'Jun 18', carrier: 'CMA CGM',      sla: 'Nominal' },
-    { id: 'SO-4526', origin: 'Hong Kong, HK',       destination: 'Savannah, GA',     status: 'In Transit',  eta: 'Jun 20', carrier: 'COSCO',        sla: 'Nominal' },
-  ],
+  shipments: [],
   updateShipmentStatus: (shipmentId, status) => set((state) => ({
     shipments: state.shipments.map(s => s.id === shipmentId ? { ...s, status } : s)
   })),
@@ -105,13 +107,10 @@ export const useAppStore = create<AppState>((set) => ({
 
   fetchShipments: async () => {
     try {
-      const { data, error } = await supabase.from('shipments').select('*');
-      if (error) throw error;
-      if (data && data.length > 0) {
-        set({ shipments: data });
-      }
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/shipments`);
+      set({ shipments: res.data });
     } catch (err) {
-      console.warn('Failed to fetch shipments from Supabase. Falling back to default data.', err);
+      console.warn('Failed to fetch shipments from SQLite API.', err);
     }
   }
 }));

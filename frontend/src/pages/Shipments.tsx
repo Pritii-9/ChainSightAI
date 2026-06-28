@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Search, Filter, ArrowUpDown, Ship, Clock3, TrendingUp, Download, MoreHorizontal, MapPin } from 'lucide-react';
+import axios from 'axios';
+import { Search, Filter, ArrowUpDown, Ship, Clock3, TrendingUp, Download, MapPin, BrainCircuit, X } from 'lucide-react';
+import { BACKEND_URL } from '../constants';
 import { useAppStore } from '../store/useAppStore';
 
 const STATUS_STYLES = {
@@ -18,6 +20,30 @@ const SUMMARY_CARDS = [
 export const Shipments = () => {
   const { shipments } = useAppStore();
   const [search, setSearch] = useState('');
+  
+  // Prediction state
+  const [selectedShipment, setSelectedShipment] = useState<any>(null);
+  const [prediction, setPrediction] = useState<any>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
+
+  const handlePredict = async (shipment: any) => {
+    setSelectedShipment(shipment);
+    setPrediction(null);
+    setIsPredicting(true);
+    
+    try {
+      const res = await axios.post(`${BACKEND_URL}/predict/delay`, {
+        origin: shipment.origin,
+        destination: shipment.destination,
+        carrier: shipment.carrier
+      });
+      setPrediction(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPredicting(false);
+    }
+  };
   
   const filtered = shipments.filter((s: any) =>
     [s.id, s.carrier, s.origin, s.destination].some((f) => f.toLowerCase().includes(search.toLowerCase()))
@@ -147,8 +173,11 @@ export const Shipments = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-zinc-800 dark:hover:text-slate-200">
-                      <MoreHorizontal size={16} />
+                    <button 
+                      onClick={() => handlePredict(ship)}
+                      className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200 dark:bg-zinc-900 dark:text-slate-300 dark:hover:bg-zinc-800"
+                    >
+                      <BrainCircuit size={14} /> Predict
                     </button>
                   </td>
                 </tr>
@@ -172,6 +201,82 @@ export const Shipments = () => {
           </div>
         </div>
       </section>
+
+      {/* --- Prediction Modal --- */}
+      {selectedShipment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-black">
+            <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-zinc-800">
+              <div className="flex items-center gap-2">
+                <BrainCircuit className="text-blue-500" size={18} />
+                <h3 className="font-semibold text-slate-900 dark:text-white">AI Delay Prediction</h3>
+              </div>
+              <button onClick={() => setSelectedShipment(null)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="flex justify-between items-center rounded-md bg-slate-50 p-4 dark:bg-zinc-900/50">
+                <div>
+                  <div className="text-[10px] font-bold uppercase text-slate-500">Shipment</div>
+                  <div className="font-mono font-medium text-slate-900 dark:text-white">{selectedShipment.id}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] font-bold uppercase text-slate-500">Route</div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {selectedShipment.origin.split(',')[0]} → {selectedShipment.destination.split(',')[0]}
+                  </div>
+                </div>
+              </div>
+
+              {isPredicting ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-4">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500" />
+                  <p className="text-sm text-slate-500">Running ML inference model...</p>
+                </div>
+              ) : prediction ? (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="text-center">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Calculated Risk Score</div>
+                    <div className={`text-5xl font-bold tracking-tight ${
+                      prediction.prediction === 'High Risk' ? 'text-rose-500' : 
+                      prediction.prediction === 'Medium Risk' ? 'text-amber-500' : 'text-emerald-500'
+                    }`}>
+                      {prediction.risk_score}%
+                    </div>
+                    <div className={`mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase ${
+                      prediction.prediction === 'High Risk' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 
+                      prediction.prediction === 'Medium Risk' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 
+                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    }`}>
+                      {prediction.prediction}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-3 text-xs font-bold uppercase text-slate-500">Top Contributing Factors</h4>
+                    <div className="space-y-2">
+                      {prediction.top_factors.map((factor: any, i: number) => (
+                        <div key={i} className="flex justify-between items-center rounded border border-slate-100 bg-white p-3 dark:border-zinc-800 dark:bg-black">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{factor.factor}</span>
+                          <span className={`text-xs font-bold ${factor.impact.startsWith('+') ? 'text-rose-500' : 'text-emerald-500'}`}>
+                            {factor.impact}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="text-center text-[10px] font-mono text-slate-400">
+                    Model: {prediction.model_version}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase, IS_DEMO_MODE } from '../lib/supabase';
+import axios from 'axios';
 import { Loader2, Mail, ArrowRight, ShieldCheck, KeyRound, ArrowLeft } from 'lucide-react';
 
 // Google Brand Icon SVG
@@ -19,88 +19,24 @@ export const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !otp) return; // 'otp' is used as password state here to minimize diff
     
     setLoading(true);
     setError(null);
 
     try {
-      if (IS_DEMO_MODE) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setIsOtpSent(true);
-        return;
-      }
-
-      const { error: signInError } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          // Enforce admin-only: reject unknown emails by not creating users on the fly
-          shouldCreateUser: false, 
-        }
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/auth/login`, {
+        username: email,
+        password: otp
       });
-      if (signInError) throw signInError;
-      setIsOtpSent(true);
+      localStorage.setItem('chainsight_token', res.data.token);
+      localStorage.setItem('demo_logged_in', 'true');
+      window.location.href = '/';
     } catch (err: any) {
-      setError(err.message || 'Error sending verification code. Ensure your email is registered as an admin.');
+      setError(err.response?.data?.error || 'Invalid credentials.');
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (IS_DEMO_MODE) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        if (otp === '123456' || otp.length === 6) {
-           localStorage.setItem('demo_logged_in', 'true');
-           window.location.href = '/';
-        } else {
-           throw new Error("Invalid verification code");
-        }
-        return;
-      }
-
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: 'email'
-      });
-      if (verifyError) throw verifyError;
-    } catch (err: any) {
-      setError(err.message || 'Invalid verification code.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    try {
-      if (IS_DEMO_MODE) {
-        setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 800));
-        localStorage.setItem('demo_logged_in', 'true');
-        window.location.href = '/';
-        return;
-      }
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || 'Failed to authenticate with Google');
       setLoading(false);
     }
   };
@@ -122,7 +58,7 @@ export const Login: React.FC = () => {
             ChainSight Admin
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            {isOtpSent ? 'Verify your identity to continue.' : 'Secure, passwordless access to the control tower.'}
+            {isOtpSent ? 'Verify your identity to continue.' : 'Login with default: admin / admin123'}
           </p>
         </div>
 
@@ -146,30 +82,12 @@ export const Login: React.FC = () => {
               /* --- STEP 1: Request OTP --- */
               <div className="space-y-6">
                 
-                {/* Google Auth Button */}
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full h-11 flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-zinc-700 disabled:opacity-70 transition-all duration-200 shadow-sm"
-                >
-                  <GoogleIcon />
-                  <span className="text-sm">Sign in with Google</span>
-                </button>
 
-                {/* Divider */}
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-slate-200 dark:border-zinc-800"></div>
-                  <span className="flex-shrink-0 mx-4 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                    Or use email
-                  </span>
-                  <div className="flex-grow border-t border-slate-200 dark:border-zinc-800"></div>
-                </div>
 
-                <form onSubmit={handleSendOtp} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5">
                   <div className="space-y-2">
                     <label htmlFor="email" className="block text-sm font-semibold text-slate-900 dark:text-white">
-                      Admin Email
+                      Username
                     </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -177,11 +95,32 @@ export const Login: React.FC = () => {
                       </div>
                       <input
                         id="email"
-                        type="email"
+                        type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="block w-full h-11 pl-10 pr-4 bg-white dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-black focus:border-black dark:focus:ring-white dark:focus:border-white transition-all duration-200 text-sm shadow-sm"
-                        placeholder="name@chainsight.io"
+                        placeholder="admin"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="otp" className="block text-sm font-semibold text-slate-900 dark:text-white">
+                      Password
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <KeyRound size={18} className="text-slate-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors duration-200" />
+                      </div>
+                      <input
+                        id="otp"
+                        type="password"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="block w-full h-11 pl-10 pr-4 bg-white dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-black focus:border-black dark:focus:ring-white dark:focus:border-white transition-all duration-200 text-sm shadow-sm"
+                        placeholder="••••••••"
                         required
                         disabled={loading}
                       />
@@ -190,77 +129,21 @@ export const Login: React.FC = () => {
 
                   <button
                     type="submit"
-                    disabled={loading || !email}
+                    disabled={loading || !email || !otp}
                     className="group relative w-full h-11 flex items-center justify-center gap-2 bg-black hover:bg-slate-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-200 font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 dark:focus:ring-white dark:focus:ring-offset-zinc-900 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-md shadow-black/10 dark:shadow-white/10"
                   >
                     {loading ? (
                       <Loader2 size={18} className="animate-spin" />
                     ) : (
                       <>
-                        <span className="tracking-wide text-sm">Send Code</span>
+                        <span className="tracking-wide text-sm">Sign In</span>
                         <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-1" />
                       </>
                     )}
                   </button>
                 </form>
               </div>
-            ) : (
-              /* --- STEP 2: Verify OTP --- */
-              <div className="space-y-6 animate-fade-in">
-                
-                <div className="text-center pb-2">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 mb-4 text-slate-600 dark:text-slate-300">
-                    <KeyRound size={20} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Check your email</h3>
-                  <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-                    We sent a 6-digit verification code to <span className="font-semibold text-slate-900 dark:text-slate-200">{email}</span>
-                  </p>
-                </div>
-
-                <form onSubmit={handleVerifyOtp} className="space-y-5">
-                  <div className="space-y-2">
-                    <label htmlFor="otp" className="sr-only">Verification Code</label>
-                    <input
-                      id="otp"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                      className="block w-full h-14 text-center tracking-[0.5em] text-2xl font-mono bg-white dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-black focus:border-black dark:focus:ring-white dark:focus:border-white transition-all duration-200 shadow-sm"
-                      placeholder="------"
-                      required
-                      autoFocus
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || otp.length < 6}
-                    className="w-full h-11 flex items-center justify-center bg-black hover:bg-slate-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-200 font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 dark:focus:ring-white dark:focus:ring-offset-zinc-900 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
-                  >
-                    {loading ? <Loader2 size={18} className="animate-spin" /> : 'Verify & Sign In'}
-                  </button>
-                </form>
-
-                <div className="pt-2 text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsOtpSent(false);
-                      setOtp('');
-                      setError(null);
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-slate-500 hover:text-black dark:hover:text-white hover:underline underline-offset-4 transition-colors"
-                  >
-                    <ArrowLeft size={14} /> Back to email
-                  </button>
-                </div>
-              </div>
-            )}
+            ) : null}
             
           </div>
         </div>

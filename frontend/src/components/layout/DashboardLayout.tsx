@@ -24,6 +24,13 @@ export const DashboardLayout = () => {
   }, [dark]);
 
   useEffect(() => {
+    // Request notification permission for smart alerts
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
     axios.get(`${BACKEND_URL}/health`)
       .then((res) => {
         if (res.data.demo_mode !== undefined) {

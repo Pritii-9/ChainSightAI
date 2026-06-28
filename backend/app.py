@@ -68,6 +68,22 @@ def create_app():
     from api.analytics_routes import analytics_bp
     app.register_blueprint(analytics_bp)
 
+    from api.predict_routes import predict_bp
+    app.register_blueprint(predict_bp)
+
+    from api.incident_routes import incident_bp
+    app.register_blueprint(incident_bp)
+
+    from api.auth_routes import auth_bp
+    app.register_blueprint(auth_bp)
+
+    from api.shipment_routes import shipments_bp
+    app.register_blueprint(shipments_bp)
+    
+    from api.db import init_db
+    # Initialize SQLite DB
+    init_db()
+
     from services.simulator import start_simulator
     start_simulator(socketio, app)
 
